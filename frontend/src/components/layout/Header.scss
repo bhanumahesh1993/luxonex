@@ -113,37 +113,56 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background: rgba(255, 255, 255, 1); /* Fully opaque white */
-    backdrop-filter: blur(10px); /* Frosted glass effect */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 10;
+    background: rgba(245, 245, 245, 0.7); /* Semi-transparent background */
+    backdrop-filter: blur(5px);
+    z-index: 20;
     display: flex;
-    flex-wrap: wrap;
-    padding: 30px; /* Increased padding for better coverage */
-    width: 100%;
-    border-radius: 8px; /* Rounded corners */
-    transition: opacity 0.3s ease;
-
+    padding: 30px 40px;
+    width: 100%; /* Full width to cover all columns */
+    margin: 0;
+    border: none;
+    box-sizing: border-box;
+    min-height: 100%; /* Ensure it covers all content vertically */
+    
+    /* Force the container to expand to hold all content */
+    &::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    
     .rc-mega-menu-content {
       display: flex;
-      flex-direction: row; /* Align sections horizontally */
-      justify-content: space-between; /* Space out sections */
       width: 100%;
-
+      flex-wrap: nowrap; /* Prevent wrapping */
+      justify-content: flex-start; /* Align to the left */
+      
       .rc-mega-menu-section {
-        margin-right: 30px; /* Space between sections */
-        min-width: 150px; /* Minimum width for each section */
-
-        b {
-          font-weight: bold;
-          margin-bottom: 5px;
-          display: block; /* Make the title a block element */
+        margin-right: 60px;
+        min-width: 150px;
+        
+        &:last-child {
+          margin-right: 0;
         }
-
-        div {
-          margin-bottom: 5px; /* Space between items */
-          font-size: 14px; /* Adjust font size */
-          color: #333; /* Text color */
+        
+        h3 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 20px;
+        }
+        
+        a {
+          display: block;
+          text-decoration: none;
+          color: #555;
+          font-size: 16px;
+          margin-bottom: 12px;
+          transition: color 0.3s;
+          
+          &:hover {
+            color: #007bff;
+          }
         }
       }
     }
