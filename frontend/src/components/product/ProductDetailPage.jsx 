@@ -1,0 +1,427 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import axios from 'axios';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
+import RelatedProducts from '../components/RelatedProducts';
+import ProductReviews from '../components/ProductReviews';
+import './ProductDetailPage.scss';
+
+const ProductDetailPage = () => {
+  const { productId } = useParams();
+  const { addToCart } = useCart();
+  const { addToWishlist, isInWishlist, removeFromWishlist } = useWishlist();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [activeImage, setActiveImage] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch product details
+        const productResponse = await axios.get(`/api/products/${productId}`);
+        setProduct(productResponse.data);
+        
+        // Initialize selected options
+        if (productResponse.data.options) {
+          const initialOptions = {};
+          Object.keys(productResponse.data.options).forEach(optionKey => {
+            const optionValues = productResponse.data.options[optionKey];
+            if (optionValues.length > 0) {
+              initialOptions[optionKey] = optionValues[0];
+            }
+          });
+          setSelectedOptions(initialOptions);
+        }
+        
+        // Fetch related products
+        const relatedResponse = await axios.get(`/api/products/related/${productId}`);
+        setRelatedProducts(relatedResponse.data);
+        
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch product details. Please try again later.');
+        setLoading(false);
+        console.error('Error fetching product details:', err);
+      }
+    };
+    
+    fetchProductDetails();
+  }, [productId]);
+  
+  const handleQuantityChange = (value) => {
+    if (value >= 1 && value <= (product.stock || 10)) {
+      setQuantity(value);
+    }
+  };
+  
+  const handleOptionChange = (optionName, optionValue) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [optionName]: optionValue
+    }));
+  };
+  
+  const handleAddToCart = () => {
+    addToCart(product, quantity, selectedOptions);
+  };
+  
+  const handleWishlistToggle = () => {
+    if (isInWishlist(product._id)) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+  
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading product details...</p>
+      </div>
+    );
+  }
+  
+  if (error || !product) {
+    return (
+      <div className="error-container">
+        <h2>Oops!</h2>
+        <p>{error || 'Product not found.'}</p>
+        <Link to="/shop" className="btn btn-primary">Return to Shop</Link>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="product-detail-page">
+      <div className="container">
+        <div className="breadcrumb-wrapper">
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item"><Link to="/">Home</Link></li>
+              <li className="breadcrumb-item"><Link to="/shop">Shop</Link></li>
+              <li className="breadcrumb-item"><Link to={`/category/${product.category.toLowerCase()}`}>{product.category}</Link></li>
+              <li className="breadcrumb-item active" aria-current="page">{product.name}</li>
+            </ol>
+          </nav>
+        </div>
+        
+        <div className="product-main">
+          <div className="row">
+            <div className="col-lg-6">
+              <div className="product-gallery">
+                <div className="main-image">
+                  <img 
+                    src={product.images && product.images.length > 0 
+                      ? product.images[activeImage] 
+                      : '/images/placeholder.jpg'
+                    } 
+                    alt={product.name}
+                  />
+                </div>
+                {product.images && product.images.length > 1 && (
+                  <div className="image-thumbnails">
+                    {product.images.map((image, index) => (
+                      <div 
+                        key={index}
+                        className={`thumbnail ${index === activeImage ? 'active' : ''}`}
+                        onClick={() => setActiveImage(index)}
+                      >
+                        <img src={image} alt={`${product.name} - view ${index + 1}`} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="col-lg-6">
+              <div className="product-info">
+                <h1 className="product-title">{product.name}</h1>
+                
+                <div className="product-meta">
+                  <div className="product-category">Category: <Link to={`/category/${product.category.toLowerCase()}`}>{product.category}</Link></div>
+                  
+                  <div className="product-rating">
+                    <div className="stars">
+                      {[...Array(5)].map((_, i) => (
+                        <i 
+                          key={i} 
+                          className={
+                            i < Math.floor(product.ratings) 
+                              ? 'fas fa-star' 
+                              : i < product.ratings 
+                                ? 'fas fa-star-half-alt' 
+                                : 'far fa-star'
+                          }
+                        ></i>
+                      ))}
+                    </div>
+                    <span className="review-count">({product.reviews ? product.reviews.length : 0} reviews)</span>
+                  </div>
+                </div>
+                
+                <div className="product-price">
+                  {product.salePrice ? (
+                    <>
+                      <span className="current-price">${product.salePrice.toFixed(2)}</span>
+                      <span className="old-price">${product.price.toFixed(2)}</span>
+                      <span className="discount">
+                        {Math.round(((product.price - product.salePrice) / product.price) * 100)}% Off
+                      </span>
+                    </>
+                  ) : (
+                    <span className="current-price">${product.price.toFixed(2)}</span>
+                  )}
+                </div>
+                
+                <div className="product-description">
+                  <p>{product.description}</p>
+                </div>
+                
+                {product.options && Object.keys(product.options).length > 0 && (
+                  <div className="product-options">
+                    {Object.keys(product.options).map(optionName => (
+                      <div className="option-group" key={optionName}>
+                        <h4 className="option-title">{optionName}</h4>
+                        <div className="option-values">
+                          {product.options[optionName].map(optionValue => (
+                            <button
+                              key={optionValue}
+                              className={`option-btn ${selectedOptions[optionName] === optionValue ? 'active' : ''}`}
+                              onClick={() => handleOptionChange(optionName, optionValue)}
+                            >
+                              {optionValue}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="product-actions">
+                  <div className="quantity-control">
+                    <button 
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(quantity - 1)}
+                    >
+                      <i className="fas fa-minus"></i>
+                    </button>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max={product.stock || 10} 
+                      value={quantity}
+                      onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
+                      className="quantity-input"
+                    />
+                    <button 
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(quantity + 1)}
+                    >
+                      <i className="fas fa-plus"></i>
+                    </button>
+                  </div>
+                  
+                  <button 
+                    className="btn btn-primary add-to-cart-btn"
+                    onClick={handleAddToCart}
+                  >
+                    <i className="fas fa-shopping-bag"></i> Add to Cart
+                  </button>
+                  
+                  <button 
+                    className={`btn btn-outline-primary wishlist-btn ${isInWishlist(product._id) ? 'active' : ''}`}
+                    onClick={handleWishlistToggle}
+                  >
+                    <i className={isInWishlist(product._id) ? 'fas fa-heart' : 'far fa-heart'}></i>
+                  </button>
+                </div>
+                
+                <div className="product-additional-info">
+                  <div className="product-availability">
+                    <p className={`availability ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                      <i className={`fas ${product.stock > 0 ? 'fa-check-circle' : 'fa-times-circle'}`}></i>
+                      {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </p>
+                  </div>
+                  
+                  <div className="product-specs">
+                    <h4>Specifications</h4>
+                    <ul>
+                      {product.dimensions && (
+                        <li>
+                          <span className="spec-name">Dimensions:</span>
+                          <span className="spec-value">
+                            {`${product.dimensions.length} × ${product.dimensions.width} × ${product.dimensions.height} ${product.dimensions.unit}`}
+                          </span>
+                        </li>
+                      )}
+                      {product.materials && product.materials.length > 0 && (
+                        <li>
+                          <span className="spec-name">Materials:</span>
+                          <span className="spec-value">{product.materials.join(', ')}</span>
+                        </li>
+                      )}
+                      {product.colors && product.colors.length > 0 && (
+                        <li>
+                          <span className="spec-name">Available Colors:</span>
+                          <span className="spec-value">{product.colors.join(', ')}</span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                  
+                  <div className="product-share">
+                    <h4>Share</h4>
+                    <div className="social-share">
+                      <a href="#" className="social-btn" aria-label="Share on Facebook">
+                        <i className="fab fa-facebook-f"></i>
+                      </a>
+                      <a href="#" className="social-btn" aria-label="Share on Twitter">
+                        <i className="fab fa-twitter"></i>
+                      </a>
+                      <a href="#" className="social-btn" aria-label="Share on Pinterest">
+                        <i className="fab fa-pinterest-p"></i>
+                      </a>
+                      <a href="#" className="social-btn" aria-label="Share via Email">
+                        <i className="fas fa-envelope"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="product-tabs">
+          <ul className="nav nav-tabs" id="productTabs" role="tablist">
+            <li className="nav-item" role="presentation">
+              <button 
+                className="nav-link active" 
+                id="description-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#description" 
+                type="button" 
+                role="tab" 
+                aria-controls="description" 
+                aria-selected="true"
+              >
+                Description
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button 
+                className="nav-link" 
+                id="specifications-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#specifications" 
+                type="button" 
+                role="tab" 
+                aria-controls="specifications" 
+                aria-selected="false"
+              >
+                Specifications
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button 
+                className="nav-link" 
+                id="reviews-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#reviews" 
+                type="button" 
+                role="tab" 
+                aria-controls="reviews" 
+                aria-selected="false"
+              >
+                Reviews ({product.reviews ? product.reviews.length : 0})
+              </button>
+            </li>
+          </ul>
+          
+          <div className="tab-content" id="productTabsContent">
+            <div 
+              className="tab-pane fade show active" 
+              id="description" 
+              role="tabpanel" 
+              aria-labelledby="description-tab"
+            >
+              <div className="product-description-content">
+                <div dangerouslySetInnerHTML={{ __html: product.detailedDescription || product.description }} />
+              </div>
+            </div>
+            
+            <div 
+              className="tab-pane fade" 
+              id="specifications" 
+              role="tabpanel" 
+              aria-labelledby="specifications-tab"
+            >
+              <div className="product-specifications-content">
+                <table className="specs-table">
+                  <tbody>
+                    {product.dimensions && (
+                      <tr>
+                        <th>Dimensions</th>
+                        <td>{`${product.dimensions.length} × ${product.dimensions.width} × ${product.dimensions.height} ${product.dimensions.unit}`}</td>
+                      </tr>
+                    )}
+                    {product.materials && product.materials.length > 0 && (
+                      <tr>
+                        <th>Materials</th>
+                        <td>{product.materials.join(', ')}</td>
+                      </tr>
+                    )}
+                    {product.colors && product.colors.length > 0 && (
+                      <tr>
+                        <th>Available Colors</th>
+                        <td>{product.colors.join(', ')}</td>
+                      </tr>
+                    )}
+                    {product.weight && (
+                      <tr>
+                        <th>Weight</th>
+                        <td>{`${product.weight} kg`}</td>
+                      </tr>
+                    )}
+                    {/* Category-specific specifications */}
+                    {product.category === 'Sofa' && product.sofaCategory && (
+                      <tr>
+                        <th>Sofa Type</th>
+                        <td>{product.sofaCategory}</td>
+                      </tr>
+                    )}
+                    {/* Add more category-specific specs as needed */}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div 
+              className="tab-pane fade" 
+              id="reviews" 
+              role="tabpanel" 
+              aria-labelledby="reviews-tab"
+            >
+              <ProductReviews productId={product._id} reviews={product.reviews || []} />
+            </div>
+          </div>
+        </div>
+        
+        <RelatedProducts products={relatedProducts} />
+      </div>
+    </div>
+  );
+};
+
+export default ProductDetailPage;

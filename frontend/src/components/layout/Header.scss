@@ -1,0 +1,210 @@
+@import '../../styles/variables';
+
+.rc-header {
+  background-color: transparent; /* Default to transparent */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+  
+  &:hover {
+    background-color: #fff; /* White background on hover */
+  }
+
+  .rc-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px; /* Padding for the header */
+  }
+
+  .rc-header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .rc-search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .rc-header-center {
+    flex-grow: 1;
+    text-align: center;
+
+    .rc-logo-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .rc-logo-img {
+        height: 50px; /* Adjust logo size */
+        margin-right: 10px; /* Space between logo and text */
+      }
+
+      .rc-logo-text {
+        font-size: 24px; /* Logo text size */
+        font-weight: bold;
+        color: #333; /* Logo text color */
+      }
+    }
+  }
+
+  .rc-header-right {
+    display: flex;
+    align-items: center;
+
+    .rc-header-country {
+      margin-right: 20px; /* Space between country and icons */
+      font-size: 16px;
+      color: #333;
+    }
+
+    .rc-header-icon {
+      margin-left: 15px; /* Space between icons */
+      font-size: 20px;
+      color: #333;
+      position: relative;
+
+      .rc-cart-count {
+        position: absolute;
+        top: -5px;
+        right: -10px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .rc-nav {
+    display: flex;
+    justify-content: center; /* Center the navigation items */
+    padding: 10px 0; /* Padding for nav */
+
+    .rc-nav-list {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .rc-nav-item {
+        margin: 0 15px; /* Space between nav items */
+        position: relative;
+
+        .rc-nav-link {
+          text-decoration: none;
+          color: #333;
+          font-weight: 600;
+          padding: 10px 15px;
+          transition: color 0.3s;
+
+          &:hover {
+            color: #007bff; /* Change color on hover */
+          }
+        }
+      }
+    }
+  }
+
+  .rc-mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(255, 255, 255, 1); /* Fully opaque white */
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 30px; /* Increased padding for better coverage */
+    width: 100%;
+    border-radius: 8px; /* Rounded corners */
+    transition: opacity 0.3s ease;
+
+    .rc-mega-menu-content {
+      display: flex;
+      flex-direction: row; /* Align sections horizontally */
+      justify-content: space-between; /* Space out sections */
+      width: 100%;
+
+      .rc-mega-menu-section {
+        margin-right: 30px; /* Space between sections */
+        min-width: 150px; /* Minimum width for each section */
+
+        b {
+          font-weight: bold;
+          margin-bottom: 5px;
+          display: block; /* Make the title a block element */
+        }
+
+        div {
+          margin-bottom: 5px; /* Space between items */
+          font-size: 14px; /* Adjust font size */
+          color: #333; /* Text color */
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .header {
+    .nav {
+      .nav-links {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .header {
+    .nav {
+      .nav-actions {
+        .user-menu {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Darker overlay for better text visibility */
+  z-index: 2;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  text-align: center;
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Stronger shadow for better visibility */
+    color: #fff; /* Ensure text is white */
+  }
+
+  p {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Stronger shadow for better visibility */
+    color: #fff; /* Ensure text is white */
+  }
+} 

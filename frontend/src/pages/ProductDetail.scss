@@ -1,0 +1,234 @@
+.product-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .product-gallery {
+    .main-image {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+
+      img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+    }
+
+    .thumbnail-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+
+      .thumbnail {
+        cursor: pointer;
+        border-radius: 5px;
+        overflow: hidden;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+
+        &.active {
+          border-color: #007bff;
+        }
+
+        img {
+          width: 100%;
+          height: 100px;
+          object-fit: cover;
+        }
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+
+  .product-info {
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .price {
+      font-size: 1.5rem;
+      color: #007bff;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .product-meta {
+      margin-bottom: 2rem;
+
+      .meta-item {
+        display: flex;
+        margin-bottom: 0.5rem;
+
+        .label {
+          font-weight: 600;
+          color: #333;
+          width: 100px;
+        }
+
+        .value {
+          color: #666;
+        }
+      }
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+
+      .quantity-selector {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+
+        button {
+          width: 40px;
+          height: 40px;
+          border: none;
+          background-color: #f8f9fa;
+          cursor: pointer;
+          font-size: 1.2rem;
+          color: #333;
+
+          &:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+          }
+
+          &:hover:not(:disabled) {
+            background-color: #e9ecef;
+          }
+        }
+
+        input {
+          width: 60px;
+          height: 40px;
+          border: none;
+          text-align: center;
+          font-size: 1rem;
+
+          &::-webkit-inner-spin-button,
+          &::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+        }
+      }
+
+      .add-to-cart {
+        flex: 1;
+        padding: 0 2rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover:not(:disabled) {
+          background-color: #0056b3;
+        }
+
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      }
+
+      .wishlist-btn {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        i {
+          color: #666;
+        }
+
+        &.active {
+          border-color: #dc3545;
+          background-color: #dc3545;
+
+          i {
+            color: white;
+          }
+        }
+
+        &:hover {
+          border-color: #dc3545;
+          background-color: #dc3545;
+
+          i {
+            color: white;
+          }
+        }
+      }
+    }
+
+    .product-features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding-top: 2rem;
+      border-top: 1px solid #ddd;
+
+      .feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+
+        i {
+          font-size: 1.5rem;
+          color: #007bff;
+          margin-bottom: 0.5rem;
+        }
+
+        span {
+          color: #666;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  color: #dc3545;
+} 
